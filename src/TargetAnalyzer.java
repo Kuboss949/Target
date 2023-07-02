@@ -5,10 +5,20 @@ import org.opencv.imgproc.Imgproc;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.round;
+
 public class TargetAnalyzer {
     private String sourceDirectoryPath;
     private String destDirectoryPath;
     private String file;
+    int[] bullsEye = new int[3];
+
+    Point center;
+    float radius;
+    float outerRadius;
+    float shotRadius;
+
+
     public TargetAnalyzer(String file, String source, String dest){
         this.file = file;
         sourceDirectoryPath = source;
@@ -58,12 +68,27 @@ public class TargetAnalyzer {
 
             Mat output = new Mat();
             Scalar color = new Scalar(0, 0, 255);
-            if(filteredContours.size()>1)
-                Imgproc.drawContours(image, List.of(filteredContours.get(filteredContours.size()-1)) , -1, color, 2);
-            else
-                Imgproc.drawContours(image, filteredContours , -1, color, 2);
 
-            Imgcodecs.imwrite(destDirectoryPath + file, image);
+            center = new Point();
+            float[] radiuss = new float[1];
+
+
+            if(filteredContours.size()==0)
+                System.out.println("Circle not found " + file);
+            else{
+                if(filteredContours.size()>1)
+                    Imgproc.minEnclosingCircle(new MatOfPoint2f(filteredContours.get(filteredContours.size()-1).toArray()), center, radiuss);
+                else
+                    Imgproc.minEnclosingCircle(new MatOfPoint2f(filteredContours.get(0).toArray()), center, radiuss);
+
+                radius = radiuss[0];
+
+                Imgproc.circle(image, center, (int) radius, new Scalar(0, 255, 0), 2);
+
+                outerRadius = 22.75f*radius/15.25f-2;
+                shotRadius = 2.25f*radius/15.25f;
+            }
+            //Imgcodecs.imwrite(destDirectoryPath + file, image);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
