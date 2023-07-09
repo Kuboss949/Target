@@ -16,8 +16,8 @@ import static java.lang.Math.abs;
 public class Main {
     public static void main(String[] args) {
 
-        for(int i=1; i<19; i++){
-            TargetAnalyzer t = new TargetAnalyzer(i+".jpg");
+        for(int i=10; i<22; i++){
+            TargetAnalyzer t = new TargetAnalyzer(i+".jpg", 2);
             t.findBullsEye();
         }
 
